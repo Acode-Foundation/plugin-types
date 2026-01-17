@@ -1,0 +1,437 @@
+/// <reference path="./ace/index.d.ts" />
+/// <reference path="./components/index.d.ts" />
+/// <reference path="./dialogs/index.d.ts" />
+/// <reference path="./handlers/index.d.ts" />
+/// <reference path="./lib/index.d.ts" />
+/// <reference path="./pages/fileBrowser/index.d.ts" />
+/// <reference path="./theme/index.d.ts" />
+/// <reference path="./utils/index.d.ts" />
+/// <reference path="./fileSystem.d.ts" />
+/// <reference path="./sideBarApps.d.ts" />
+
+declare namespace Acode {
+	interface PluginInit {
+		/**
+		 * When the init function is called, it will receive 3 parameters:
+		 * @param baseUrl The base URL of the plugin. You can use this URL to access the files in the plugin directory.
+		 * @param $page This page object can be used to show content.
+		 * @param options This object can be used to access the cached files.
+		 */
+		(baseUrl: string, $page: WCPage, options: PluginInitOptions): void;
+	}
+
+	interface PluginInitOptions {
+		/** Url of the cached file. */
+		cacheFileUrl: string;
+
+		/** File object of the cached file. Using this object, you can write/read the file. */
+		cacheFile: FileSystem;
+
+		/** If this is the first time the plugin is loaded, this value will be true. Otherwise, it will be false. */
+		firstInit: boolean;
+	}
+
+	interface PluginSettings {
+		/** An array of settings. */
+		list: {
+			/** The key of the setting. This key will be used to access the value of the setting. */
+			key: string;
+
+			/** The text of the setting. This text will be displayed in the settings page. */
+			text: string;
+
+			/** The icon of the setting. This icon will be displayed in the settings page. */
+			icon?: string;
+
+			/** The icon color of the setting. This icon color will be displayed in the settings page. */
+			iconColor?: string;
+
+			/** The info of the setting. This info will be displayed in the settings page. */
+			info?: string;
+
+			/** The value of the setting. This value will be displayed in the settings page. */
+			value?: unknown;
+
+			/** The value text of the setting. This value text will be displayed in the settings page. */
+			valueText?: (value: unknown) => string;
+
+			/** If this property is set to true, the setting will be displayed as a checkbox. */
+			checkbox?: boolean;
+
+			/** If this property is set to an array, the setting will be displayed as a select.
+			 * The array should contain the options of the select. Each option can be a string or an array of two strings.
+			 * If the option is a string, the value and the text of the option will be the same.
+			 * If the option is an array of two strings, the first string will be the value of
+			 * the option and the second string will be the text of the option. */
+			select?: Array<Array<string> | string>;
+
+			/**
+			 * If this property is set to true, the setting will be displayed as a prompt.
+			 */
+			prompt?: string;
+
+			/**
+			 * The type of the prompt. This property is only used when the prompt property is set to true. The default value is text.
+			 */
+			promptType?: string;
+
+			/**
+			 * The options of the prompt. This property is only used when the prompt property is set to true and the promptType property is set to select.
+			 */
+			promptOptions?: {
+				/**
+				 * The regular expression to match the value.
+				 */
+				match: RegExp;
+
+				/**
+				 * If this property is set to true, the value is required.
+				 */
+				required: boolean;
+
+				/**
+				 * The placeholder of the prompt.
+				 */
+				placeholder: string;
+
+				/**
+				 * The test function to test the value.
+				 * @param value
+				 * @returns
+				 */
+				test: (value: unknown) => boolean;
+			}[];
+		}[];
+
+		/**
+		 * The callback function that will be called when the settings are changed.
+		 * @param key
+		 * @param value
+		 * @returns
+		 */
+		cb: (key: string, value: unknown) => void;
+	}
+
+	type Require = <K extends string>(
+		moduleName: K,
+	) => Lowercase<K> extends keyof Modules ? Modules[Lowercase<K>] : unknown;
+
+	interface Modules {
+		acemodes: AceModes;
+		actionstack: ActionStack;
+		addedfolder: AddedFolder;
+		alert: Alert;
+		color: Color;
+		colorpicker: ColorPicker;
+		confirm: Confirm;
+		contextmenu: ContextMenuConstructor;
+		createkeyboardevent: CreateKeyboardEvent;
+		dialogbox: DialogBoxConstructor;
+		editorfile: EditorFile;
+		encodings: Encodings;
+		filebrowser: FileBrowser;
+		filelist: FileList;
+		fonts: Fonts;
+		fs: FS;
+		fsoperation: FS;
+		inputhints: InputHints;
+		helpers: Helpers;
+		intent: Intent;
+		keyboard: Keyboard;
+		loader: Loader;
+		multiprompt: MultiPrompt;
+		openfolder: OpenFolder;
+		page: WCPage;
+		palette: Palette;
+		projects: Projects;
+		prompt: Prompt;
+		select: Select;
+		selectionmenu: SelectionMenu;
+		settings: Settings;
+		sidebarapps: SidebarApps;
+		sidebutton: SideButtonConstructor;
+		terminal: Terminal;
+		themebuilder: typeof ThemeBuilder;
+		themes: Themes;
+		tointernalurl: Helpers["toInternalUri"];
+		toast: Toast;
+		tutorial: Tutorial;
+		url: Url;
+		windowresize: WindowResize;
+	}
+
+	interface AddIconOptions {
+		/** If true, icon will use svg currentColor and adapt to theme */
+		monochrome?: boolean;
+	}
+
+	interface FileHandlerOptions {
+		/** File extensions to handle (without dots), e.g. ['pdf', 'docx'] */
+		extensions: string[];
+		/** Function that handles opening the file */
+		handleFile: (uri: string) => void | Promise<void>;
+	}
+}
+
+/** The acode object is the global object that provides access to the Acode API.
+ * You can use this object to access the API methods. */
+interface Acode {
+	/** This method is used to register the plugin.
+	 * @param pluginId` The ID of your plugin.
+	 * @param init The function that will be called when the plugin is loaded.
+	 * @param settings You can use this parameter to define the settings of the plugin.
+	 */
+	setPluginInit(
+		pluginId: string,
+		init: Acode.PluginInit,
+		settings?: Acode.PluginSettings,
+	): void;
+
+	/** This method is used to set the unmount function.
+	 * This function will be called when the plugin is unloaded.
+	 * You can use this function to clean up the plugin.
+	 */
+	setPluginUnmount(id: string, unmount: () => void): void;
+
+	/**
+	 * @param id plugin id
+	 * @param baseUrl local plugin url
+	 * @param $page
+	 */
+	initPlugin(
+		id: string,
+		baseUrl: string,
+		$page: Acode.WCPage,
+		options?: Acode.PluginInitOptions,
+	): Promise<void>;
+
+	unmountPlugin(id: string): void;
+
+	/** This method is used to define a module.
+	 * @param moduleName The name of the module.
+	 * @param module The module object. Module name is case insensitive.
+	 */
+	define(moduleName: string, module: unknown): void;
+
+	/** This method is used to require a module.
+	 * @param moduleName The name of the module. Module name is case insensitive.
+	 * # Example
+	 *  ```js
+	 * acode.require("say-hello").hello(); // Hello World!
+	 * ```
+	 */
+	require: Acode.Require;
+
+	/**
+	 * This method executes a command defined in file src/lib/commands.js.
+	 * @param command The name of the command. Command name is case insensitive.
+	 * @param value The value of the command.
+	 */
+	exec(command: string, value?: unknown): boolean | undefined;
+
+	/**
+	 * This method is used to register a formatter.
+	 * @param pluginId The ID of your plugin.
+	 * @param extensions An array of file extensions.
+	 * @param format The function that will be called when the file is formatted.
+	 */
+	registerFormatter(
+		pluginId: string,
+		extensions: string[],
+		format: () => Promise<void>,
+	): void;
+
+	/**
+	 * This method is used to unregister a formatter.
+	 * @param pluginId The ID of your plugin.
+	 */
+	unregisterFormatter(pluginId: string): void;
+
+	format(selectIfNull?: boolean): Promise<void>;
+
+	get formatters(): { id: string; name: string; exts: string[] };
+
+	getFormatterFor(extensions: string[]): [id: string, name: string][];
+
+	/**
+	 * This method is used to add an icon.
+	 * @param iconName The name of the icon.
+	 * @param iconSrc The URL of the icon.
+	 * @param options Optional settings
+	 */
+	addIcon(
+		iconName: string,
+		iconSrc: string,
+		options?: Acode.AddIconOptions,
+	): void;
+
+	/** When making Ajax or fetch requests, you need to convert file:// URLs to internal URLs. This method will do it for you. */
+	toInternalUrl(url: string): Promise<string>;
+
+	/**
+	 * Displays a notification in Acode with a title, message and optional configuration.
+	 *  @since v1.10.6, versionCode: 954
+	 */
+	pushNotification(
+		title: string,
+		message: string,
+		options?: {
+			/** Icon for the notification. Can be a URL, base64 encoded image, icon class or SVG string */
+			icon?: string;
+
+			/** Whether notification should auto close. Defaults to true */
+			autoClose?: boolean;
+
+			/** Callback function when notification is clicked */
+			action?: () => void;
+
+			/** Type of notification - can be 'info', 'warning', 'error' or 'success'. Defaults to 'info' */
+			type?: "info" | "warning" | "error" | "success";
+		},
+	): void;
+
+	/** Installs an Acode plugin from registry with its id by the consent of user.
+	 * # Example
+	 *
+	 * ```js
+	 * acode.installPlugin("plugin-id", "installer-plugin-name");
+	 * ```
+	 * @since v1.10.6, versionCode: 954
+	 */
+	installPlugin(pluginId: string, installerPluginName: string): Promise<void>;
+
+	/**
+	 * Creates a new EditorFile instance. This is an alternative to using the EditorFile constructor directly.
+	 * @param filename  Name of the file
+	 * @param options File creation options
+	 * @returns A new EditorFile instance
+	 * @since v1.11.2, versionCode: 958
+	 */
+	newEditorFile(filename: string, options?: Acode.FileOptions): void;
+
+	joinUrl: Acode.Url["join"];
+	alert: Acode.Alert;
+	confirm: Acode.Confirm;
+	select: Acode.Select;
+	multiPrompt: Acode.MultiPrompt;
+	loader: Acode.Loader;
+	prompt: Acode.Prompt;
+	fsOperation: Acode.FS;
+
+	/**
+	 * Opens the file browser dialog.
+	 * @param mode Whether to select files, folders, or both
+	 * @param info Optional info text to display
+	 * @param doesOpenLast Should file browser open lastly visited directory?
+	 * @param defaultDir Default directory to open
+	 * @returns Selected file or folder information
+	 */
+	fileBrowser: FileBrowser;
+
+	get exitAppMessage(): string | undefined;
+
+	setLoadingMessage(message: string): void;
+
+	/**
+	 * Wait for a plugin to be fully loaded.
+	 * Useful for plugins that depend on other plugins.
+	 * @param pluginId The ID of the plugin to wait for
+	 * @returns Resolves with true when the plugin is loaded, rejects if plugin fails to load
+	 * @since v1.11.8
+	 */
+	waitForPlugin(pluginId: string): Promise<boolean>;
+
+	/**
+	 * Register a custom file type handler.
+	 * Allows plugins to handle specific file extensions with custom logic.
+	 * @param id Unique identifier for the handler
+	 * @param options Handler configuration
+	 */
+	registerFileHandler(id: string, options: Acode.FileHandlerOptions): void;
+	/**
+	 * Unregister a previously registered file type handler.
+	 * @param id The handler id to remove
+	 */
+	unregisterFileHandler(id: string): void;
+}
+
+/** The acode object is the global object that provides access to the Acode API.
+ * You can use this object to access the API methods. */
+declare const acode: Acode;
+
+/** The directory where all the assets are stored. */
+declare const ASSETS_DIRECTORY: string;
+
+/**  The directory where all the cache files are stored. */
+declare const CACHE_STORAGE: string;
+
+/** The directory where all the data files are stored. */
+declare const DATA_STORAGE: string;
+
+/** The directory where all the plugins are stored. */
+declare const PLUGIN_DIR: string;
+
+/** Whether the app supports theme or not. */
+declare const DOES_SUPPORT_THEME: boolean;
+
+/** Whether the app is free version or not. */
+declare const IS_FREE_VERSION: boolean;
+
+/** The file where all the keybindings are stored. */
+declare const KEYBINDING_FILE: string;
+
+/** The Android SDK version. */
+declare const ANDROID_SDK_INT: number;
+
+/**
+ * Logs a message with the specified log level.
+ * @param level - The log level.
+ * @param message - The message to be logged.
+ */
+declare function log(
+	level: "error" | "warn" | "info" | "debug",
+	message: unknown,
+): void;
+
+declare const ace: Ace;
+
+interface Window {
+	/** The acode object is the global object that provides access to the Acode API.
+	 * You can use this object to access the API methods. */
+	acode: Acode;
+
+	/** The directory where all the assets are stored. */
+	ASSETS_DIRECTORY: string;
+
+	/**  The directory where all the cache files are stored. */
+	CACHE_STORAGE: string;
+
+	/** The directory where all the data files are stored. */
+	DATA_STORAGE: string;
+
+	/** The directory where all the plugins are stored. */
+	PLUGIN_DIR: string;
+
+	/** Whether the app supports theme or not. */
+	DOES_SUPPORT_THEME: boolean;
+
+	/** Whether the app is free version or not. */
+	IS_FREE_VERSION: boolean;
+
+	/** The file where all the keybindings are stored. */
+	KEYBINDING_FILE: string;
+
+	/** The Android SDK version. */
+	ANDROID_SDK_INT: number;
+
+	tag: typeof tag;
+
+	/**
+	 * Logs a message with the specified log level.
+	 * @param level - The log level.
+	 * @param message - The message to be logged.
+	 */
+	log: typeof log;
+
+	ace: Ace;
+}

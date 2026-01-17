@@ -1,0 +1,26 @@
+{
+	"name": "acode-plugin-types",
+	"version": "1.11.7",
+	"types": "index.d.ts",
+	"author": {
+		"name": "Acode Foundation",
+		"email": "contact@acode.app"
+	},
+	"readme": "README.md",
+	"repository": {
+		"url": "git+https://github.com/Acode-Foundation/plugin-types.git"
+	},
+	"scripts": {
+		"lint": "biome check",
+		"format": "biome format --write",
+		"check": "biome check --write",
+		"link-types": "node ./scripts/linkTypes.js"
+	},
+	"files": ["./src", "README.md", "./index.d.ts", "./types"],
+	"keywords": ["acode", "plugin-types", "acode-app"],
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"typescript": "^5.9.3"
+	}
+}
