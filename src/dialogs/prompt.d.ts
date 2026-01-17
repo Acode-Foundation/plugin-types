@@ -20,12 +20,12 @@ declare namespace Acode {
 		(
 			message: string,
 			defaultValue: string,
-			type: PropmtType,
+			type: PromptType,
 			options: PromptOptions<string>,
 		): Promise<string | null>;
 	}
 
-	type PropmtType =
+	type PromptType =
 		| "textarea"
 		| "text"
 		| "number"

@@ -5,8 +5,8 @@
 /// <reference path="./fileSystem.d.ts" />
 /// <reference path="./handlers/index.d.ts" />
 /// <reference path="./lib/index.d.ts" />
+/// <reference path="./pages/index.d.ts" />
+/// <reference path="./plugins/index.d.ts" />
 /// <reference path="./sideBarApps.d.ts" />
 /// <reference path="./theme/index.d.ts" />
 /// <reference path="./utils/index.d.ts" />
-/// <reference path="./plugins/index.d.ts" />
-
