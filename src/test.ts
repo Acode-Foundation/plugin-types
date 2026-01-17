@@ -58,6 +58,9 @@ async function _acodeTest() {
 	});
 
 	const _fileBrowser = acode.fileBrowser("file", "test");
+	Executor.execute("ls -l").then((res) => {
+		console.log(res);
+	});
 }
 
 namespace ui {

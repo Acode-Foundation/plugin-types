@@ -8,3 +8,4 @@
 /// <reference path="./sideBarApps.d.ts" />
 /// <reference path="./theme/index.d.ts" />
 /// <reference path="./utils/index.d.ts" />
+/// <reference path="./plugins/terminal/index.d.ts" />
