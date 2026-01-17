@@ -1,6 +1,6 @@
 {
 	"name": "acode-plugin-types",
-	"version": "1.11.7-patch.1",
+	"version": "1.11.7-patch.2",
 	"types": "index.d.ts",
 	"author": {
 		"name": "Acode Foundation",
