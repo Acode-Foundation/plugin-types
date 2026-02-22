@@ -25,7 +25,7 @@ declare namespace Acode {
 		off(event: "hide" | "show", cb: (this: WCPage) => void): void;
 
 		/** Updates the page title */
-		setTitle(title: string): void;
+		settitle(title: string): void;
 
 		/** Hides the page */
 		hide(): string;
