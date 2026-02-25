@@ -141,7 +141,7 @@ declare namespace Acode {
 		loader: Loader;
 		multiprompt: MultiPrompt;
 		openfolder: OpenFolder;
-		page: WCPage;
+		page: (title: string, options?: { lead?: HTMLElement, tail?: HTMLElement}) => WCPage;
 		palette: Palette;
 		projects: Projects;
 		prompt: Prompt;
