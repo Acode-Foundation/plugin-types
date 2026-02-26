@@ -112,7 +112,7 @@ declare namespace Acode {
 		cb: (key: string, value: unknown) => void;
 	}
 
-	type Require = <K extends string>(
+	type Require = <K extends keyof Modules | (string & {})>(
 		moduleName: K,
 	) => Lowercase<K> extends keyof Modules ? Modules[Lowercase<K>] : unknown;
 
@@ -127,7 +127,7 @@ declare namespace Acode {
 		contextmenu: ContextMenuConstructor;
 		createkeyboardevent: CreateKeyboardEvent;
 		dialogbox: DialogBoxConstructor;
-		editorfile: EditorFile;
+		editorfile: typeof EditorFile;
 		encodings: Encodings;
 		filebrowser: FileBrowser;
 		filelist: FileList;

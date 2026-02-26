@@ -30,9 +30,6 @@ declare namespace Acode {
 		/** Hides the page */
 		hide(): string;
 
-		/** Shows the page */
-		show(): string;
-
 		/**
 		 * The main content container
 		 */

@@ -18,7 +18,7 @@ declare namespace Acode {
 		 * Adds a file to the manager's file list and updates the UI.
 		 * @param file - The file to be added.
 		 */
-		addFile(file: EditorFile): void;
+		addFile(file: Partial<EditorFile>): void;
 
 		/**
 		 * This is an instance of the Ace editor.
