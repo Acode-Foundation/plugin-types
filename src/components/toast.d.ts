@@ -7,7 +7,7 @@ declare namespace Acode {
 		 * @param message The message to be displayed in the toast.
 		 * @param duration The duration in milliseconds for which the toast should be displayed.
 		 */
-		(message: string, duration: number): void;
+		(message: string, duration?: number): void;
 	}
 }
 
