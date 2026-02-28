@@ -154,7 +154,7 @@ declare namespace Acode {
 		themebuilder: typeof ThemeBuilder;
 		themes: Themes;
 		tointernalurl: Helpers["toInternalUri"];
-		toast: Toast;
+		toast: typeof Toast;
 		tutorial: Tutorial;
 		url: Url;
 		windowresize: WindowResize;
