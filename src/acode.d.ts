@@ -141,7 +141,10 @@ declare namespace Acode {
 		loader: Loader;
 		multiprompt: MultiPrompt;
 		openfolder: OpenFolder;
-		page: (title: string, options?: { lead?: HTMLElement, tail?: HTMLElement}) => WCPage;
+		page: (
+			title: string,
+			options?: { lead?: HTMLElement; tail?: HTMLElement },
+		) => WCPage;
 		palette: Palette;
 		projects: Projects;
 		prompt: Prompt;
@@ -154,7 +157,7 @@ declare namespace Acode {
 		themebuilder: typeof ThemeBuilder;
 		themes: Themes;
 		tointernalurl: Helpers["toInternalUri"];
-		toast: typeof Toast;
+		toast: Toast;
 		tutorial: Tutorial;
 		url: Url;
 		windowresize: WindowResize;
