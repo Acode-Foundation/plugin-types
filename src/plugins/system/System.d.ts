@@ -560,8 +560,8 @@ interface System {
    * @param onFail - Error callback.
    */
   getRewardStatus(
-      onSuccess: (status: RewardStatus | string) => void,
-      onFail: SystemErrorCallback,
+    onSuccess: (status: RewardStatus | string) => void,
+    onFail: SystemErrorCallback,
   ): void;
   
   /**
@@ -571,9 +571,9 @@ interface System {
    * @param onFail - Error callback.
    */
   redeemReward(
-      offerId: string,
-      onSuccess: (status: RewardStatus | string) => void,
-      onFail: SystemErrorCallback,
+    offerId: string,
+    onSuccess: (status: RewardStatus | string) => void,
+    onFail: SystemErrorCallback,
   ): void;
 
 

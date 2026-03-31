@@ -53,11 +53,11 @@ declare namespace Acode {
 		/**
 		 * Terminal Touch Selection More Options Methods
 		 */
-    moreOptions: TerminalMoreOptionsMethods;
+		moreOptions: TerminalMoreOptionsMethods;
 		
-    touchSelection: {
-      moreOptions: TerminalMoreOptionsMethods;
-    }
+		touchSelection: {
+		  moreOptions: TerminalMoreOptionsMethods;
+		}
 		
 		themes: {
 			/**
@@ -110,9 +110,9 @@ declare namespace Acode {
 			Xterm.ITerminalInitOnlyOptions {
 		name?: string;
 		serverMode?: boolean;
-    port?: number;
-    pinned?: boolean;
-    render?: boolean;
+		port?: number;
+		pinned?: boolean;
+		render?: boolean;
 	}
 
 	interface TerminalInstance {
@@ -123,23 +123,23 @@ declare namespace Acode {
   }
 	
   interface TerminalMoreOptionsMethods {
-    /**
+		/**
   	 * Register an option for the "More" menu in touch selection.
   	 */
-    add: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
-    /**
-     * Remove an option from the "More" menu in touch selection.
-     * @returns 
-     */
-    remove: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
-    /**
-     * List all registered options in the "More" menu in touch selection.
-     */
-    list: () => void;
+		add: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
+		/**
+		 * Remove an option from the "More" menu in touch selection.
+		 * @returns 
+		 */
+		remove: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
+		/**
+		 * List all registered options in the "More" menu in touch selection.
+		 */
+		list: () => void;
   }
 
   interface TerminalMoreOptionParams {
-    id?: string;
+  	id?: string;
 		label?: string | ((context: TerminalMoreOptionsContext) => string);
 		text?: string;
 		title?: string;
@@ -149,26 +149,26 @@ declare namespace Acode {
 		onselect?: (context: TerminalMoreOptionsContext) => void | Promise<void>;
 		onclick?: (context: TerminalMoreOptionsContext) => void | Promise<void>;
   }
-  
+
   interface TerminalMoreOptionsContext {
-    terminal: TerminalInstance;
-    // TODO: declaration.
-    touchSelection: any;
-    selection: Xterm.Terminal["getSelection"];
-    /**
-     * Clear the current selection in the terminal.
-     * @returns 
-     */
-    clearSelection: () => void;
-    /**
-     * Copy the current selection in the terminal.
-     * @returns 
-     */
-    copySelection: () => void;
-    /**
-     * Paste from the clipboard into the terminal.
-     * @returns 
-     */
-    pasteFromClipboard: () => void;
+		terminal: TerminalInstance;
+		// TODO: declaration.
+		touchSelection: any;
+		selection: Xterm.Terminal["getSelection"];
+		/**
+		 * Clear the current selection in the terminal.
+		 * @returns 
+		 */
+		clearSelection: () => void;
+		/**
+		 * Copy the current selection in the terminal.
+		 * @returns 
+		 */
+		copySelection: () => void;
+		/**
+		 * Paste from the clipboard into the terminal.
+		 * @returns 
+		 */
+		pasteFromClipboard: () => void;
   }
 }
