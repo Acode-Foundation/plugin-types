@@ -124,8 +124,8 @@ declare namespace Acode {
 
   interface TerminalMoreOptionsMethods {
 		/**
-  	 * Register an option for the "More" menu in touch selection.
-  	 */
+		 * Register an option for the "More" menu in touch selection.
+		 * */
 		add: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
 		/**
 		 * Remove an option from the "More" menu in touch selection.
