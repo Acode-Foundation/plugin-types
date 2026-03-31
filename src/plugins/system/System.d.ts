@@ -553,28 +553,28 @@ interface System {
 		success: SystemSuccessCallback,
 		error: SystemErrorCallback,
   ): void;
-	
-  /**
-   * Gets the current Ads reward status.
-   * @param onSuccess - Callback with the reward status.
-   * @param onFail - Error callback.
-   */
-  getRewardStatus(
-    onSuccess: (status: RewardStatus | string) => void,
-    onFail: SystemErrorCallback,
-  ): void;
-  
-  /**
-   * Redeems a reward offer.
-   * @param offerId - The ID of the reward offer to redeem.
-   * @param onSuccess - Callback with the reward status.
-   * @param onFail - Error callback.
-   */
+
+	/**
+		* Gets the current Ads reward status.
+		* @param onSuccess - Callback with the reward status.
+		* @param onFail - Error callback.
+		*/
+	getRewardStatus(
+		onSuccess: (status: RewardStatus | string) => void,
+		onFail: SystemErrorCallback,
+	): void;
+
+	/**
+		* Redeems a reward offer.
+		* @param offerId - The ID of the reward offer to redeem.
+		* @param onSuccess - Callback with the reward status.
+		* @param onFail - Error callback.
+		*/
   redeemReward(
-    offerId: string,
-    onSuccess: (status: RewardStatus | string) => void,
-    onFail: SystemErrorCallback,
-  ): void;
+		offerId: string,
+		onSuccess: (status: RewardStatus | string) => void,
+		onFail: SystemErrorCallback,
+	): void;
 
 
 	/**

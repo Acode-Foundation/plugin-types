@@ -49,16 +49,16 @@ declare namespace Acode {
 		 * @param id Terminal ID
 		 */
 		close(id: string): void;
-		
+
 		/**
 		 * Terminal Touch Selection More Options Methods
 		 */
 		moreOptions: TerminalMoreOptionsMethods;
-		
+
 		touchSelection: {
 		  moreOptions: TerminalMoreOptionsMethods;
 		}
-		
+
 		themes: {
 			/**
 			 * Register a plugin theme
@@ -121,7 +121,7 @@ declare namespace Acode {
 		file: EditorFile;
 		container: HTMLDivElement;
   }
-	
+
   interface TerminalMoreOptionsMethods {
 		/**
   	 * Register an option for the "More" menu in touch selection.
@@ -129,7 +129,7 @@ declare namespace Acode {
 		add: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
 		/**
 		 * Remove an option from the "More" menu in touch selection.
-		 * @returns 
+		 * @returns
 		 */
 		remove: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
 		/**
@@ -138,8 +138,8 @@ declare namespace Acode {
 		list: () => void;
   }
 
-  interface TerminalMoreOptionParams {
-  	id?: string;
+	interface TerminalMoreOptionParams {
+		id?: string;
 		label?: string | ((context: TerminalMoreOptionsContext) => string);
 		text?: string;
 		title?: string;
@@ -157,17 +157,17 @@ declare namespace Acode {
 		selection: Xterm.Terminal["getSelection"];
 		/**
 		 * Clear the current selection in the terminal.
-		 * @returns 
+		 * @returns
 		 */
 		clearSelection: () => void;
 		/**
 		 * Copy the current selection in the terminal.
-		 * @returns 
+		 * @returns
 		 */
 		copySelection: () => void;
 		/**
 		 * Paste from the clipboard into the terminal.
-		 * @returns 
+		 * @returns
 		 */
 		pasteFromClipboard: () => void;
   }
