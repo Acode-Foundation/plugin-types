@@ -64,24 +64,6 @@ interface SystemIntent {
 	extras?: Record<string, unknown>;
 }
 
-interface RewardStatus {
-  adFreeUntil: number;
-  lastExpiredRewardUntil: number;
-  isActive: boolean;
-  remainingMs: number;
-  redemptionsToday: number;
-  remainingRedemptions: number;
-  maxRedemptionsPerDay: number;
-  maxActivePassMs: number;
-  hasPendingExpiryNotice: boolean;
-  expiryNoticePendingUntil: number;
-  canRedeem: boolean;
-  redeemDisabledReason: string;
-  grantedDurationMs?: number;
-  appliedDurationMs?: number;
-  offerId?: string;
-}
-
 /**
  * Success callback type.
  */
@@ -553,29 +535,6 @@ interface System {
 		success: SystemSuccessCallback,
 		error: SystemErrorCallback,
   ): void;
-
-	/**
-	 * Gets the current Ads reward status.
-	 * @param onSuccess - Callback with the reward status.
-	 * @param onFail - Error callback.
-	 */
-	getRewardStatus(
-		onSuccess: (status: RewardStatus | string) => void,
-		onFail: SystemErrorCallback,
-	): void;
-
-	/**
-	 * Redeems a reward offer.
-	 * @param offerId - The ID of the reward offer to redeem.
-	 * @param onSuccess - Callback with the reward status.
-	 * @param onFail - Error callback.
-	 */
-	redeemReward(
-		offerId: string,
-		onSuccess: (status: RewardStatus | string) => void,
-		onFail: SystemErrorCallback,
-	): void;
-
 
 	/**
 	 * Compares file content with provided text in a background thread.
