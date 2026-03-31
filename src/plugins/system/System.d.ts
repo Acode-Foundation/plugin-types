@@ -64,6 +64,24 @@ interface SystemIntent {
 	extras?: Record<string, unknown>;
 }
 
+interface RewardStatus {
+  adFreeUntil: number;
+  lastExpiredRewardUntil: number;
+  isActive: boolean;
+  remainingMs: number;
+  redemptionsToday: number;
+  remainingRedemptions: number;
+  maxRedemptionsPerDay: number;
+  maxActivePassMs: number;
+  hasPendingExpiryNotice: boolean;
+  expiryNoticePendingUntil: number;
+  canRedeem: boolean;
+  redeemDisabledReason: string;
+  grantedDurationMs?: number;
+  appliedDurationMs?: number;
+  offerId?: string;
+}
+
 /**
  * Success callback type.
  */
@@ -434,19 +452,33 @@ interface System {
 	openInBrowser(src: string): void;
 
 	/**
-	 * Launches an Android application.
-	 * @param app - Package name of the app to launch.
-	 * @param className - Optional class name to launch.
-	 * @param data - Optional data to pass.
-	 * @param success - Callback on success.
-	 * @param error - Error callback.
-	 */
+   * Launch an Android application activity.
+   *
+   * @param {string} app - Package name of the application (e.g. `com.example.app`).
+   * @param {string} className - Fully qualified activity class name (e.g. `com.example.app.MainActivity`).
+   * @param {Object<string, (string|number|boolean)>} [extras] - Optional key-value pairs passed as Intent extras.
+   * @param {(message: string) => void} [onSuccess] - Callback invoked when the activity launches successfully.
+   * @param {(error: any) => void} [onFail] - Callback invoked if launching the activity fails.
+   *
+   * @example
+   * System.launchApp(
+   *   "com.example.app",
+   *   "com.example.app.MainActivity",
+   *   {
+   *     user: "example",
+   *     age: 20,
+   *     premium: true
+   *   },
+   *   (msg) => console.log(msg),
+   *   (err) => console.error(err)
+   * );
+   */
 	launchApp(
 		app: string,
 		className: string | null,
-		data: string | null,
-		success: SystemSuccessCallback,
-		error: SystemErrorCallback,
+		extras: string | null,
+		onSuccess: SystemSuccessCallback,
+		onFail: SystemErrorCallback,
 	): void;
 
 	/**
@@ -520,7 +552,30 @@ interface System {
 		key: string,
 		success: SystemSuccessCallback,
 		error: SystemErrorCallback,
-	): void;
+  ): void;
+	
+  /**
+   * Gets the current Ads reward status.
+   * @param onSuccess - Callback with the reward status.
+   * @param onFail - Error callback.
+   */
+  getRewardStatus(
+      onSuccess: (status: RewardStatus | string) => void,
+      onFail: SystemErrorCallback,
+  ): void;
+  
+  /**
+   * Redeems a reward offer.
+   * @param offerId - The ID of the reward offer to redeem.
+   * @param onSuccess - Callback with the reward status.
+   * @param onFail - Error callback.
+   */
+  redeemReward(
+      offerId: string,
+      onSuccess: (status: RewardStatus | string) => void,
+      onFail: SystemErrorCallback,
+  ): void;
+
 
 	/**
 	 * Compares file content with provided text in a background thread.

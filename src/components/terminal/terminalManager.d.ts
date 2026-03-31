@@ -49,7 +49,16 @@ declare namespace Acode {
 		 * @param id Terminal ID
 		 */
 		close(id: string): void;
-
+		
+		/**
+		 * Terminal Touch Selection More Options Methods
+		 */
+    moreOptions: TerminalMoreOptionsMethods;
+		
+    touchSelection: {
+      moreOptions: TerminalMoreOptionsMethods;
+    }
+		
 		themes: {
 			/**
 			 * Register a plugin theme
@@ -101,7 +110,9 @@ declare namespace Acode {
 			Xterm.ITerminalInitOnlyOptions {
 		name?: string;
 		serverMode?: boolean;
-		port?: number;
+    port?: number;
+    pinned?: boolean;
+    render?: boolean;
 	}
 
 	interface TerminalInstance {
@@ -109,5 +120,55 @@ declare namespace Acode {
 		name: string;
 		file: EditorFile;
 		container: HTMLDivElement;
-	}
+  }
+	
+  interface TerminalMoreOptionsMethods {
+    /**
+  	 * Register an option for the "More" menu in touch selection.
+  	 */
+    add: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
+    /**
+     * Remove an option from the "More" menu in touch selection.
+     * @returns 
+     */
+    remove: (option: TerminalMoreOptionParams | TerminalMoreOptionParams[]) => void;
+    /**
+     * List all registered options in the "More" menu in touch selection.
+     */
+    list: () => void;
+  }
+
+  interface TerminalMoreOptionParams {
+    id?: string;
+		label?: string | ((context: TerminalMoreOptionsContext) => string);
+		text?: string;
+		title?: string;
+		icon?: string;
+		enabled?: boolean | ((object: object) => boolean);
+		action?: (context: TerminalMoreOptionsContext) => void | Promise<void>;
+		onselect?: (context: TerminalMoreOptionsContext) => void | Promise<void>;
+		onclick?: (context: TerminalMoreOptionsContext) => void | Promise<void>;
+  }
+  
+  interface TerminalMoreOptionsContext {
+    terminal: TerminalInstance;
+    // TODO: declaration.
+    touchSelection: any;
+    selection: Xterm.Terminal["getSelection"];
+    /**
+     * Clear the current selection in the terminal.
+     * @returns 
+     */
+    clearSelection: () => void;
+    /**
+     * Copy the current selection in the terminal.
+     * @returns 
+     */
+    copySelection: () => void;
+    /**
+     * Paste from the clipboard into the terminal.
+     * @returns 
+     */
+    pasteFromClipboard: () => void;
+  }
 }
