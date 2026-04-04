@@ -16,11 +16,24 @@
 		"check": "biome check --write",
 		"link-types": "node ./scripts/linkTypes.js"
 	},
-	"files": ["./src", "README.md", "./index.d.ts", "./types"],
-	"keywords": ["acode", "plugin-types", "acode-app"],
+	"files": [
+		"./src",
+		"README.md",
+		"./index.d.ts",
+		"./types"
+	],
+	"keywords": [
+		"acode",
+		"plugin-types",
+		"acode-app"
+	],
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@codemirror/language": "^6.12.3",
+		"@codemirror/state": "^6.6.0"
 	}
 }

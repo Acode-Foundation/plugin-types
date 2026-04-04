@@ -1,3 +1,4 @@
+/// <reference path="./cmAPI/index.d.ts" />
 /// <reference path="./ace/index.d.ts" />
 /// <reference path="./components/index.d.ts" />
 /// <reference path="./dialogs/index.d.ts" />
@@ -116,6 +117,9 @@ declare namespace Acode {
 		moduleName: K,
 	) => Lowercase<K> extends keyof Modules ? Modules[Lowercase<K>] : unknown;
 
+	/**
+	 * Keys should be in lowercase (to work in UPPERCASE and lowercase)
+	 */
 	interface Modules {
 		acemodes: AceModes;
 		actionstack: ActionStack;
@@ -128,6 +132,8 @@ declare namespace Acode {
 		createkeyboardevent: CreateKeyboardEvent;
 		dialogbox: DialogBoxConstructor;
 		editorfile: typeof EditorFile;
+		editorthemes: EditorThemes;
+		editorlanguages: EditorLanguages;
 		encodings: Encodings;
 		filebrowser: FileBrowser;
 		filelist: FileList;
