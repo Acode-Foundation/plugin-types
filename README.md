@@ -1,8 +1,18 @@
-# Types for Acode App
+# acode-plugin-types
 
-This package contains types for Acode's Plugin Api.
+TypeScript declarations for Acode's public plugin API.
 
-## Sources Used
+## Development
 
-1. [Acode Docs](https://docs.acode.app/docs) - Official Acode Documentation.
-1. [Acode's Source Code](https://github.com/Acode-Foundation/Acode).
+```sh
+bun install
+bun run build
+bun run check
+```
+
+`bun run build` regenerates the internal `index.d.ts` reference barrels under `plugin-types/src`.
+
+## Sources
+
+- [Acode Docs](https://docs.acode.app/docs)
+- [Acode Source Code](https://github.com/Acode-Foundation/Acode)

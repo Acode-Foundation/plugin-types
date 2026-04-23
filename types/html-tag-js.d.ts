@@ -1,4 +1,5 @@
 type HTMLTagNames = keyof HTMLElementTagNameMap & string;
+type HTMLElementContent = HTMLElement & Array<HTMLElement> | string | DocumentFragment;
 
 interface HTMLElement {
   /**
@@ -30,7 +31,7 @@ interface HTMLElement {
   /**
    * Sets or gets the content of the element.
    */
-  content: HTMLElement & Array<HTMLElement>;
+  content: HTMLElementContent;
 }
 
 type StyleList = {
@@ -59,7 +60,7 @@ interface HTMLElementAttributes {
    * Sets content of the element.
    * @example $div.content = tag('span', 'Hello World!');
    */
-  content?: HTMLElement & Array<HTMLElement>;
+  content?: HTMLElementContent;
   /**
    * css class name
    */

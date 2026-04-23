@@ -1,7 +1,4 @@
 declare namespace Acode {
-	/**
-	 * The Settings module provides a way to interact with Acode's settings, allowing you to read, update and listen for changes to settings values.
-	 */
 	interface Settings {
 		readonly QUICKTOOLS_ROWS: number;
 		readonly QUICKTOOLS_GROUP_CAPACITY: number;
@@ -25,50 +22,26 @@ declare namespace Acode {
 
 		init(): Promise<void>;
 
-		/**
-		 * Updates one or more settings.
-		 * @param settings Object containing settings to update.
-		 * @param showToast Whether to show a confirmation toast (default: true).
-		 * @param save Whether to save settings (default: true).
-		 */
 		update(
 			settings: Partial<ISettings>,
 			showToast: boolean,
 			save: boolean,
 		): Promise<void>;
 
-		/**
-		 * Resets settings to default values.
-		 * @param setting The name of the setting to reset. If setting is not provided, all settings will be reset.
-		 */
 		reset(setting?: string): Promise<void>;
 
-		/**
-		 * Adds an event listener
-		 * @param event Event name in format 'update:setting' or 'reset'
-		 * @param callback Function to call when event occurs
-		 */
 		on<K extends keyof ISettings>(
 			event: `update:${K}`,
 			callback: (value: ISettings[K]) => void,
 		): void;
 		on(event: "reset", callback: (value: ISettings) => void): void;
 
-		/**
-		 * Removes an event listener from the settings.
-		 * @param event  Event name in format 'update:setting' or 'reset'
-		 * @param callback Function to remove
-		 */
 		off<K extends keyof ISettings>(
 			event: `update:${K}`,
 			callback: (value: ISettings[K]) => void,
 		): void;
 		off(event: "reset", callback: (value: ISettings) => void): void;
 
-		/**
-		 * Gets the value of the setting.
-		 * @param setting Name of the setting to get.
-		 */
 		get<K extends keyof ISettings>(setting: K): ISettings[K];
 
 		applyAnimationSetting(): Promise<void>;
