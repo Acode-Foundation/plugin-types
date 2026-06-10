@@ -22,6 +22,7 @@ declare namespace Acode {
 		cacheFileUrl: string;
 		cacheFile: FileSystem;
 		firstInit: boolean;
+		ctx: PluginContext | null;
 	}
 
 	type PluginSettingSelectOption =
@@ -55,6 +56,285 @@ declare namespace Acode {
 		cb: (key: string, value: unknown) => void;
 	}
 
+	interface PluginContext {
+		created_at: number;
+		uuid: string;
+		grantedPermission(permission: string): Promise<boolean>;
+		listAllPermissions(): Promise<string[]>;
+		getSecret(key: string, defaultValue?: string): Promise<string>;
+		setSecret(key: string, value: string): Promise<void>;
+	}
+
+	interface AppConfig {
+		BASE_URL: string;
+		SUPPORTED_EDITOR: string;
+		FILE_NAME_REGEX: RegExp;
+		FONT_SIZE: RegExp;
+		DEFAULT_FILE_SESSION: string;
+		DEFAULT_FILE_NAME: string;
+		CONSOLE_PORT: number;
+		SERVER_PORT: number;
+		PREVIEW_PORT: number;
+		VIBRATION_TIME: number;
+		VIBRATION_TIME_LONG: number;
+		SCROLL_SPEED_FAST_X2: string;
+		SCROLL_SPEED_NORMAL: string;
+		SCROLL_SPEED_FAST: string;
+		SCROLL_SPEED_SLOW: string;
+		SIDEBAR_SLIDE_START_THRESHOLD_PX: number;
+		CUSTOM_THEME: string;
+		FEEDBACK_EMAIL: string;
+		ERUDA_CDN: string;
+		PLAY_STORE_URL: string;
+		API_BASE: string;
+		SKU_LIST: string[];
+		LOG_FILE_NAME: string;
+		DOCS_URL: string;
+		GITHUB_URL: string;
+		TELEGRAM_URL: string;
+		DISCORD_URL: string;
+		TWITTER_URL: string;
+		INSTAGRAM_URL: string;
+		FOXBIZ_URL: string;
+		HAS_PRO: boolean;
+	}
+
+	interface CodeMirrorNamespace {
+		autocomplete: unknown;
+		commands: unknown;
+		language: typeof import("@codemirror/language");
+		lezer: typeof import("@lezer/highlight");
+		lint: unknown;
+		search: unknown;
+		state: typeof import("@codemirror/state");
+		view: typeof import("@codemirror/view");
+	}
+
+	interface LspTransportDescriptor {
+		kind: "stdio" | "websocket" | "external";
+		command?: string;
+		args?: string[];
+		url?: string;
+		options?: Record<string, unknown>;
+		protocols?: string[];
+	}
+
+	interface LspLauncherInstallConfig {
+		kind?:
+			| "apk"
+			| "npm"
+			| "pip"
+			| "cargo"
+			| "github-release"
+			| "manual"
+			| "shell";
+		command?: string;
+		updateCommand?: string;
+		uninstallCommand?: string;
+		label?: string;
+		source?: string;
+		executable?: string;
+		packages?: string[];
+		pipCommand?: string;
+		npmCommand?: string;
+		pythonCommand?: string;
+		global?: boolean;
+		breakSystemPackages?: boolean;
+		repo?: string;
+		assetNames?: Record<string, string>;
+		archiveType?: "zip" | "binary";
+		extractFile?: string;
+		binaryPath?: string;
+	}
+
+	interface LspLauncherConfig {
+		command?: string;
+		args?: string[];
+		startCommand?: string | string[];
+		checkCommand?: string;
+		versionCommand?: string;
+		updateCommand?: string;
+		uninstallCommand?: string;
+		install?: LspLauncherInstallConfig;
+		bridge?: {
+			kind?: "axs";
+			port?: number;
+			command?: string;
+			args?: string[];
+			session?: string;
+		};
+	}
+
+	interface LspServerManifest {
+		id?: string;
+		label?: string;
+		enabled?: boolean;
+		languages?: string[];
+		transport?: LspTransportDescriptor;
+		initializationOptions?: Record<string, unknown>;
+		clientConfig?: Record<string, unknown>;
+		startupTimeout?: number;
+		capabilityOverrides?: Record<string, unknown>;
+		rootUri?:
+			| ((uri: string, context: unknown) => MaybePromise<string | null>)
+			| null;
+		documentUri?:
+			| ((
+					uri: string,
+					context: unknown,
+			  ) => MaybePromise<string | null | undefined>)
+			| null;
+		resolveLanguageId?:
+			| ((context: {
+					languageId: string;
+					languageName?: string;
+					uri?: string;
+					file?: unknown;
+			  }) => string | null)
+			| null;
+		launcher?: LspLauncherConfig;
+		useWorkspaceFolders?: boolean;
+	}
+
+	interface LspServerDefinition extends LspServerManifest {
+		id: string;
+		label: string;
+		enabled: boolean;
+		languages: string[];
+		transport: LspTransportDescriptor;
+	}
+
+	interface LspServerBundle {
+		id: string;
+		label?: string;
+		getServers: () => LspServerManifest[];
+		getExecutable?: (
+			serverId: string,
+			manifest: LspServerManifest,
+		) => string | null | undefined;
+		checkInstallation?: (
+			serverId: string,
+			manifest: LspServerManifest,
+		) => Promise<unknown>;
+		installServer?: (
+			serverId: string,
+			manifest: LspServerManifest,
+			mode: "install" | "update" | "reinstall",
+			options?: { promptConfirm?: boolean },
+		) => Promise<boolean>;
+		uninstallServer?: (
+			serverId: string,
+			manifest: LspServerManifest,
+			options?: { promptConfirm?: boolean },
+		) => Promise<boolean>;
+	}
+
+	type LspRegistrationEntry = LspServerManifest | LspServerBundle;
+
+	type LspServerUpdater = (
+		current: LspServerDefinition,
+	) => Partial<LspServerDefinition> | null;
+
+	type LspRegistryEventType = "register" | "unregister" | "update";
+
+	type LspRegistryEventListener = (
+		event: LspRegistryEventType,
+		server: LspServerDefinition,
+	) => void;
+
+	interface LspApi {
+		defineServer(options: LspServerManifest): LspServerManifest;
+		defineBundle(options: {
+			id: string;
+			label?: string;
+			servers: LspServerManifest[];
+			hooks?: {
+				getExecutable?: (
+					serverId: string,
+					manifest: LspServerManifest,
+				) => string | null | undefined;
+				checkInstallation?: (
+					serverId: string,
+					manifest: LspServerManifest,
+				) => Promise<unknown>;
+				installServer?: (
+					serverId: string,
+					manifest: LspServerManifest,
+					mode: "install" | "update" | "reinstall",
+					options?: { promptConfirm?: boolean },
+				) => Promise<boolean>;
+				uninstallServer?: (
+					serverId: string,
+					manifest: LspServerManifest,
+					options?: { promptConfirm?: boolean },
+				) => Promise<boolean>;
+			};
+		}): LspServerBundle;
+		register(
+			entry: LspRegistrationEntry,
+			options?: { replace?: boolean },
+		): LspServerDefinition | LspServerBundle;
+		upsert(entry: LspRegistrationEntry): LspServerDefinition | LspServerBundle;
+		installers: {
+			apk(options: {
+				packages: string[];
+				executable: string;
+				label?: string;
+				source?: string;
+			}): LspLauncherInstallConfig;
+			npm(options: {
+				packages: string[];
+				executable: string;
+				label?: string;
+				source?: string;
+				global?: boolean;
+			}): LspLauncherInstallConfig;
+			pip(options: {
+				packages: string[];
+				executable: string;
+				label?: string;
+				source?: string;
+				breakSystemPackages?: boolean;
+			}): LspLauncherInstallConfig;
+			cargo(options: {
+				packages: string[];
+				executable: string;
+				label?: string;
+				source?: string;
+			}): LspLauncherInstallConfig;
+			manual(options: {
+				binaryPath: string;
+				executable?: string;
+				label?: string;
+				source?: string;
+			}): LspLauncherInstallConfig;
+			shell(options: {
+				command: string;
+				executable: string;
+				updateCommand?: string;
+				uninstallCommand?: string;
+				label?: string;
+				source?: string;
+			}): LspLauncherInstallConfig;
+		};
+		servers: {
+			get(id: string): LspServerDefinition | null;
+			list(): LspServerDefinition[];
+			listForLanguage(
+				languageId: string,
+				options?: { includeDisabled?: boolean },
+			): LspServerDefinition[];
+			update(id: string, updater: LspServerUpdater): LspServerDefinition | null;
+			unregister(id: string): boolean;
+			onChange(listener: LspRegistryEventListener): () => void;
+		};
+		bundles: {
+			list(): LspServerBundle[];
+			getForServer(id: string): LspServerBundle | null;
+			unregister(id: string): boolean;
+		};
+	}
+
 	type Require = <K extends keyof Modules | (string & {})>(
 		moduleName: K,
 	) => Lowercase<K> extends keyof Modules ? Modules[Lowercase<K>] : unknown;
@@ -66,6 +346,14 @@ declare namespace Acode {
 	}
 
 	interface Modules {
+		"@codemirror/autocomplete": unknown;
+		"@codemirror/commands": unknown;
+		"@codemirror/language": typeof import("@codemirror/language");
+		"@codemirror/lint": unknown;
+		"@codemirror/search": unknown;
+		"@codemirror/state": typeof import("@codemirror/state");
+		"@codemirror/view": typeof import("@codemirror/view");
+		"@lezer/highlight": typeof import("@lezer/highlight");
 		acemodes: AceModes;
 		actionstack: ActionStack;
 		addedfolder: AddedFolder;
@@ -81,6 +369,8 @@ declare namespace Acode {
 		editorlanguages: EditorLanguages;
 		editorthemes: EditorThemes;
 		encodings: Encodings;
+		codemirror: CodeMirrorNamespace;
+		config: AppConfig;
 		filebrowser: FileBrowser;
 		filelist: FileList;
 		fonts: Fonts;
@@ -92,6 +382,7 @@ declare namespace Acode {
 		keyboard: Keyboard;
 		loader: Loader;
 		multiprompt: MultiPrompt;
+		lsp: LspApi;
 		openfolder: OpenFolder;
 		page: Page;
 		palette: Palette;
