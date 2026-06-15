@@ -33,7 +33,11 @@
 	"keywords": ["acode", "plugin-types", "acode-app"],
 	"license": "MIT",
 	"dependencies": {
+		"@codemirror/autocomplete": "^6.20.3",
+		"@codemirror/commands": "^6.10.3",
 		"@codemirror/language": "^6.12.3",
+		"@codemirror/lint": "^6.9.7",
+		"@codemirror/search": "^6.7.0",
 		"@codemirror/state": "^6.6.0",
 		"@codemirror/view": "^6.41.0",
 		"@lezer/highlight": "^1.2.3"

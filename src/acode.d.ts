@@ -100,12 +100,12 @@ declare namespace Acode {
 	}
 
 	interface CodeMirrorNamespace {
-		autocomplete: unknown;
-		commands: unknown;
+		autocomplete: typeof import("@codemirror/autocomplete");
+		commands: typeof import("@codemirror/commands");
 		language: typeof import("@codemirror/language");
 		lezer: typeof import("@lezer/highlight");
-		lint: unknown;
-		search: unknown;
+		lint: typeof import("@codemirror/lint");
+		search: typeof import("@codemirror/search");
 		state: typeof import("@codemirror/state");
 		view: typeof import("@codemirror/view");
 	}
@@ -346,11 +346,11 @@ declare namespace Acode {
 	}
 
 	interface Modules {
-		"@codemirror/autocomplete": unknown;
-		"@codemirror/commands": unknown;
+		"@codemirror/autocomplete": typeof import("@codemirror/autocomplete");
+		"@codemirror/commands": typeof import("@codemirror/commands");
 		"@codemirror/language": typeof import("@codemirror/language");
-		"@codemirror/lint": unknown;
-		"@codemirror/search": unknown;
+		"@codemirror/lint": typeof import("@codemirror/lint");
+		"@codemirror/search": typeof import("@codemirror/search");
 		"@codemirror/state": typeof import("@codemirror/state");
 		"@codemirror/view": typeof import("@codemirror/view");
 		"@lezer/highlight": typeof import("@lezer/highlight");
