@@ -108,6 +108,11 @@ declare namespace Acode {
 		search: typeof import("@codemirror/search");
 		state: typeof import("@codemirror/state");
 		view: typeof import("@codemirror/view");
+		lezer: typeof import("@lezer/highlight") & {
+			common: typeof import("@lezer/common");
+			highlight: typeof import("@lezer/highlight");
+			lr: typeof import("@lezer/lr");
+		};
 	}
 
 	interface LspTransportDescriptor {
@@ -354,6 +359,8 @@ declare namespace Acode {
 		"@codemirror/state": typeof import("@codemirror/state");
 		"@codemirror/view": typeof import("@codemirror/view");
 		"@lezer/highlight": typeof import("@lezer/highlight");
+		"@lezer/lr": typeof import("@lezer/lr");
+		"@lezer/common": typeof import("@lezer/common");
 		acemodes: AceModes;
 		actionstack: ActionStack;
 		addedfolder: AddedFolder;
