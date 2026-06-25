@@ -389,8 +389,8 @@ declare namespace Acode {
 			select(
 				server: LspServerDefinition,
 				context?: LspRuntimeContext,
-			): Promise<LspRuntimeProvider | null>
-		},
+			): Promise<LspRuntimeProvider | null>;
+		};
 		registerRuntimeProvider: Acode.LspApi["runtimes"]["register"];
 		unregisterRuntimeProvider: Acode.LspApi["runtimes"]["unregister"];
 	}
