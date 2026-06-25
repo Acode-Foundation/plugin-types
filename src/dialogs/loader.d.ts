@@ -9,7 +9,7 @@ declare namespace Acode {
 			message: string,
 			cancel: {
 				timeout: number;
-
+				oncancel?: () => void;
 				callback: () => void;
 			},
 		): void;

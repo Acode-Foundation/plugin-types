@@ -242,6 +242,54 @@ declare namespace Acode {
 		server: LspServerDefinition,
 	) => void;
 
+	interface LspRuntimeProvider {
+		id: string;
+		label: string;
+		priority?: number;
+		canHandle: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+		) => boolean | Promise<boolean>;
+		/**
+		 * Translate editor URIs into paths visible inside this runtime. The hook runs
+		 * only after this provider has been selected, so one runtime cannot rewrite
+		 * another provider's documents.
+		 */
+		resolveUris?: (
+			server: LspServerDefinition,
+			context: LspRuntimeUriResolutionContext,
+		) => MaybePromise<LspRuntimeUriResolution | null | undefined>;
+		checkInstallation?: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+		) => Promise<InstallCheckResult>;
+		install?: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+			mode: "install" | "update" | "reinstall",
+			options?: { promptConfirm?: boolean },
+		) => Promise<boolean>;
+		uninstall?: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+			options?: { promptConfirm?: boolean },
+		) => Promise<boolean>;
+		getInstallCommand?: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+			mode?: "install" | "update",
+		) => string | null;
+		getUninstallCommand?: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+		) => string | null;
+		start: (
+			server: LspServerDefinition,
+			context: LspRuntimeContext,
+		) => Promise<LspRuntimeConnection>;
+		stop?: (connection: LspRuntimeConnection) => Promise<void> | void;
+	}
+
 	interface LspApi {
 		defineServer(options: LspServerManifest): LspServerManifest;
 		defineBundle(options: {
@@ -333,6 +381,18 @@ declare namespace Acode {
 			getForServer(id: string): LspServerBundle | null;
 			unregister(id: string): boolean;
 		};
+		runtimes: {
+			register(provider: LspRuntimeProvider): LspRuntimeProvider;
+			unregister(id: string): boolean;
+			get(id: string): LspRuntimeProvider | null;
+			list(): LspRuntimeProvider[];
+			select(
+				server: LspServerDefinition,
+				context?: LspRuntimeContext,
+			): Promise<LspRuntimeProvider | null>
+		},
+		registerRuntimeProvider: Acode.LspApi["runtimes"]["register"];
+		unregisterRuntimeProvider: Acode.LspApi["runtimes"]["unregister"];
 	}
 
 	type Require = <K extends keyof Modules | (string & {})>(
