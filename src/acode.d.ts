@@ -600,6 +600,13 @@ declare const KEYBINDING_FILE: string;
 
 declare const ANDROID_SDK_INT: number;
 
+declare const Terminal = {
+	/**
+	 * @description Returns a `Promise<boolean>` that resolves to `true` when the Alpine terminal environment has already been downloaded and extracted.
+	 */
+	isInstalled(): Promise<boolean>;
+}
+
 declare function log(
 	level: "error" | "warn" | "info" | "debug",
 	message: unknown,
