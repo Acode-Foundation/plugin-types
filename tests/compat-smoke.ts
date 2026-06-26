@@ -14,7 +14,7 @@ async function acodeCompatibilitySmoke() {
 				$page.innerHTML =
 					"<h1>Example Plugin</h1><p>This is an example plugin.</p>";
 				$page.show();
-				return view.state.doc.length >= 0;
+				return (view?.state.doc.length ?? 0) >= 0;
 			},
 		});
 	});
@@ -53,12 +53,10 @@ async function acodeCompatibilitySmoke() {
 			}),
 	});
 
-	const newFile = acode.newEditorFile("example.ts", {
+	acode.newEditorFile("example.ts", {
 		text,
 		editable: true,
 	});
-
-	newFile.setMode("typescript");
 
 	acode.registerFormatter(
 		"com.example.plugin",

@@ -7,5 +7,7 @@ declare namespace Acode {
 		update(theme: ThemeBuilder): void;
 
 		list(): string[];
+
+		apply(id: string): void;
 	}
 }

@@ -103,7 +103,11 @@ declare namespace Acode {
 		autocomplete: typeof import("@codemirror/autocomplete");
 		commands: typeof import("@codemirror/commands");
 		language: typeof import("@codemirror/language");
-		lezer: typeof import("@lezer/highlight");
+		lezer: typeof import("@lezer/highlight") & {
+			common: typeof import("@lezer/common");
+			highlight: typeof import("@lezer/highlight");
+			lr: typeof import("@lezer/lr");
+		};
 		lint: typeof import("@codemirror/lint");
 		search: typeof import("@codemirror/search");
 		state: typeof import("@codemirror/state");
@@ -603,7 +607,9 @@ declare namespace Acode {
 		"@codemirror/search": typeof import("@codemirror/search");
 		"@codemirror/state": typeof import("@codemirror/state");
 		"@codemirror/view": typeof import("@codemirror/view");
+		"@lezer/common": typeof import("@lezer/common");
 		"@lezer/highlight": typeof import("@lezer/highlight");
+		"@lezer/lr": typeof import("@lezer/lr");
 		acemodes: AceModes;
 		actionstack: ActionStack;
 		addedfolder: AddedFolder;
@@ -732,12 +738,11 @@ interface Acode {
 
 	installPlugin(pluginId: string, installerPluginName: string): Promise<void>;
 
-	newEditorFile(
-		filename: string,
-		options?: Acode.FileOptions,
-	): Acode.EditorFile;
+	newEditorFile(filename: string, options?: Acode.FileOptions): void;
 
-	addCommand(descriptor: Acode.CommandDescriptor): void;
+	addCommand(
+		descriptor: Acode.CommandDescriptor,
+	): Acode.RegisteredCommand | null;
 
 	removeCommand(name: string): void;
 
@@ -745,9 +750,9 @@ interface Acode {
 		name: string,
 		view?: Ace.Editor & Acode.EditorLike,
 		args?: unknown,
-	): Acode.MaybePromise<boolean | undefined>;
+	): boolean;
 
-	listCommands(): Acode.CommandDescriptor[];
+	listCommands(): Acode.RegisteredCommand[];
 
 	joinUrl: Acode.Url["join"];
 	alert: Acode.Alert;
@@ -790,12 +795,7 @@ declare const KEYBINDING_FILE: string;
 
 declare const ANDROID_SDK_INT: number;
 
-declare const Terminal = {
-	/**
-	 * @description Returns a `Promise<boolean>` that resolves to `true` when the Alpine terminal environment has already been downloaded and extracted.
-	 */
-	isInstalled(): Promise<boolean>;
-}
+declare const Terminal: Terminal;
 
 declare function log(
 	level: "error" | "warn" | "info" | "debug",
