@@ -6,7 +6,7 @@ declare namespace Acode {
 
 		createServer(options: TerminalOptions): Promise<TerminalInstance>;
 
-		get(id: string): TerminalInstance;
+		get(id: string): TerminalInstance | null;
 
 		getAll(): Map<string, TerminalInstance>;
 
@@ -15,6 +15,12 @@ declare namespace Acode {
 		clear(id: string): void;
 
 		close(id: string): void;
+
+		moreOptions: TerminalTouchSelectionMoreOptionsApi;
+
+		touchSelection: {
+			moreOptions: TerminalTouchSelectionMoreOptionsApi;
+		};
 
 		themes: {
 			register(name: string, theme: Xterm.ITheme, pluginId: string): boolean;
@@ -42,7 +48,57 @@ declare namespace Acode {
 	interface TerminalInstance {
 		id: string;
 		name: string;
+		component: unknown;
 		file: EditorFile;
 		container: HTMLDivElement;
+	}
+
+	interface TerminalTouchSelectionMoreOptionContext {
+		touchSelection: unknown;
+		terminal?: unknown;
+		selection?: string;
+		[key: string]: unknown;
+	}
+
+	interface TerminalTouchSelectionMoreOption {
+		id?: string;
+		label?:
+			| string
+			| ((context: TerminalTouchSelectionMoreOptionContext) => string);
+		text?: string;
+		title?: string;
+		icon?: string;
+		enabled?:
+			| boolean
+			| ((context: TerminalTouchSelectionMoreOptionContext) => boolean);
+		action?: (
+			context: TerminalTouchSelectionMoreOptionContext,
+		) => void | Promise<void>;
+		onselect?: (
+			context: TerminalTouchSelectionMoreOptionContext,
+		) => void | Promise<void>;
+		onclick?: (
+			context: TerminalTouchSelectionMoreOptionContext,
+		) => void | Promise<void>;
+	}
+
+	interface TerminalRegisteredTouchSelectionMoreOption {
+		id: string;
+		label:
+			| string
+			| ((context: TerminalTouchSelectionMoreOptionContext) => string);
+		icon: string | null;
+		enabled?:
+			| boolean
+			| ((context: TerminalTouchSelectionMoreOptionContext) => boolean);
+		action: (
+			context: TerminalTouchSelectionMoreOptionContext,
+		) => void | Promise<void>;
+	}
+
+	interface TerminalTouchSelectionMoreOptionsApi {
+		add(option: TerminalTouchSelectionMoreOption): string | null;
+		remove(id: string): boolean;
+		list(): TerminalRegisteredTouchSelectionMoreOption[];
 	}
 }
