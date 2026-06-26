@@ -115,8 +115,36 @@ declare namespace Acode {
 		command?: string;
 		args?: string[];
 		url?: string;
-		options?: Record<string, unknown>;
+		options?: LspWebSocketTransportOptions;
 		protocols?: string[];
+		create?: (
+			server: LspServerDefinition,
+			context: LspTransportContext,
+		) => LspTransportHandle;
+	}
+
+	interface LspWebSocketTransportOptions {
+		binary?: boolean;
+		timeout?: number;
+		reconnect?: boolean;
+		maxReconnectAttempts?: number;
+	}
+
+	interface LspTransportHandle {
+		transport: unknown;
+		dispose: () => Promise<void> | void;
+		ready: Promise<void>;
+	}
+
+	interface LspTransportContext {
+		uri?: string;
+		file?: EditorFile;
+		view?: unknown;
+		languageId?: string;
+		rootUri?: string | null;
+		originalRootUri?: string | null;
+		debugWebSocket?: boolean;
+		dynamicPort?: number;
 	}
 
 	interface LspLauncherInstallConfig {
@@ -165,6 +193,71 @@ declare namespace Acode {
 		};
 	}
 
+	interface LspManagedServerOptions {
+		id: string;
+		label: string;
+		languages: string[];
+		enabled?: boolean;
+		useWorkspaceFolders?: boolean;
+		command?: string;
+		args?: string[];
+		transport?: Partial<LspTransportDescriptor>;
+		bridge?: LspLauncherConfig["bridge"] | null;
+		installer?: LspLauncherInstallConfig;
+		checkCommand?: string;
+		versionCommand?: string;
+		updateCommand?: string;
+		uninstallCommand?: string;
+		startupTimeout?: number;
+		initializationOptions?: Record<string, unknown>;
+		clientConfig?: Record<string, unknown> | LspClientConfig;
+		resolveLanguageId?: LspServerManifest["resolveLanguageId"];
+		rootUri?: LspServerManifest["rootUri"];
+		documentUri?: LspServerManifest["documentUri"];
+		capabilityOverrides?: Record<string, unknown>;
+	}
+
+	interface LspClientConfig {
+		useDefaultExtensions?: boolean;
+		builtinExtensions?: {
+			hover?: boolean;
+			completion?: boolean;
+			signature?: boolean;
+			keymaps?: boolean;
+			diagnostics?: boolean;
+			inlayHints?: boolean;
+			formatting?: boolean;
+		};
+		extensions?: unknown[];
+		notificationHandlers?: Record<
+			string,
+			(client: unknown, params: unknown) => boolean
+		>;
+		workspace?: (client: unknown) => unknown;
+		rootUri?: string;
+		timeout?: number;
+		highlightLanguage?: (name: string) => unknown;
+	}
+
+	interface LspRootUriContext {
+		uri?: string;
+		file?: EditorFile;
+		view?: unknown;
+		languageId?: string;
+		rootUri?: string;
+	}
+
+	interface LspDocumentUriContext extends LspRootUriContext {
+		normalizedUri?: string | null;
+	}
+
+	interface LspLanguageResolverContext {
+		languageId: string;
+		languageName?: string;
+		uri?: string;
+		file?: EditorFile;
+	}
+
 	interface LspServerManifest {
 		id?: string;
 		label?: string;
@@ -172,27 +265,27 @@ declare namespace Acode {
 		languages?: string[];
 		transport?: LspTransportDescriptor;
 		initializationOptions?: Record<string, unknown>;
-		clientConfig?: Record<string, unknown>;
+		clientConfig?: Record<string, unknown> | LspClientConfig;
 		startupTimeout?: number;
 		capabilityOverrides?: Record<string, unknown>;
 		rootUri?:
 			| ((uri: string, context: unknown) => MaybePromise<string | null>)
+			| ((
+					uri: string,
+					context: LspRootUriContext,
+			  ) => MaybePromise<string | null>)
 			| null;
 		documentUri?:
 			| ((
 					uri: string,
-					context: unknown,
+					context: LspDocumentUriContext,
 			  ) => MaybePromise<string | null | undefined>)
 			| null;
 		resolveLanguageId?:
-			| ((context: {
-					languageId: string;
-					languageName?: string;
-					uri?: string;
-					file?: unknown;
-			  }) => string | null)
+			| ((context: LspLanguageResolverContext) => string | null)
 			| null;
 		launcher?: LspLauncherConfig;
+		runtimes?: string[];
 		useWorkspaceFolders?: boolean;
 	}
 
@@ -242,6 +335,64 @@ declare namespace Acode {
 		server: LspServerDefinition,
 	) => void;
 
+	type LspWorkspaceKind =
+		| "app-private"
+		| "builtin-alpine"
+		| "termux-saf"
+		| "saf"
+		| "remote"
+		| "proot-distro"
+		| "virtual"
+		| "unknown";
+
+	interface LspRuntimeContext extends LspTransportContext {
+		documentUri?: string | null;
+		originalDocumentUri?: string;
+		serverId?: string;
+		workspaceKind?: LspWorkspaceKind;
+		allowNonTerminalWorkspace?: boolean;
+	}
+
+	type LspClientScope = "workspace" | "document";
+
+	interface LspRuntimeUriResolutionContext extends LspRuntimeContext {
+		originalDocumentUri: string;
+		originalRootUri: string | null;
+		normalizedDocumentUri: string | null;
+		normalizedRootUri: string | null;
+	}
+
+	interface LspRuntimeUriResolution {
+		documentUri?: string | null;
+		rootUri?: string | null;
+		scope?: LspClientScope;
+	}
+
+	type LspRuntimeConnection =
+		| {
+				kind: "transport";
+				providerId: string;
+				transport: LspTransportHandle;
+				dispose?: () => Promise<void> | void;
+		  }
+		| {
+				kind: "websocket";
+				providerId: string;
+				url: string;
+				protocols?: string[];
+				dispose?: () => Promise<void> | void;
+		  };
+
+	interface LspInstallCheckResult {
+		status: "present" | "missing" | "failed" | "unknown";
+		version?: string | null;
+		canInstall: boolean;
+		canUpdate: boolean;
+		message?: string;
+	}
+
+	type InstallCheckResult = LspInstallCheckResult;
+
 	interface LspRuntimeProvider {
 		id: string;
 		label: string;
@@ -262,7 +413,7 @@ declare namespace Acode {
 		checkInstallation?: (
 			server: LspServerDefinition,
 			context: LspRuntimeContext,
-		) => Promise<InstallCheckResult>;
+		) => Promise<LspInstallCheckResult>;
 		install?: (
 			server: LspServerDefinition,
 			context: LspRuntimeContext,
@@ -291,7 +442,7 @@ declare namespace Acode {
 	}
 
 	interface LspApi {
-		defineServer(options: LspServerManifest): LspServerManifest;
+		defineServer(options: LspManagedServerOptions): LspServerManifest;
 		defineBundle(options: {
 			id: string;
 			label?: string;
@@ -364,6 +515,16 @@ declare namespace Acode {
 				label?: string;
 				source?: string;
 			}): LspLauncherInstallConfig;
+			githubRelease(options: {
+				repo: string;
+				binaryPath: string;
+				executable?: string;
+				assetNames: Record<string, string>;
+				extractFile?: string;
+				archiveType?: "zip" | "binary";
+				label?: string;
+				source?: string;
+			}): LspLauncherInstallConfig;
 		};
 		servers: {
 			get(id: string): LspServerDefinition | null;
@@ -393,6 +554,35 @@ declare namespace Acode {
 		};
 		registerRuntimeProvider: Acode.LspApi["runtimes"]["register"];
 		unregisterRuntimeProvider: Acode.LspApi["runtimes"]["unregister"];
+		clientManager: {
+			setOptions(options: Partial<LspClientManagerOptions>): void;
+			getActiveClients(): LspClientState[];
+		};
+	}
+
+	interface LspClientManagerOptions {
+		diagnosticsUiExtension?: unknown | unknown[];
+		clientExtensions?: unknown | unknown[];
+		resolveRoot?: (context: LspRootUriContext) => Promise<string | null>;
+		displayFile?: (uri: string) => Promise<unknown | null>;
+		openFile?: (uri: string) => Promise<unknown | null>;
+		resolveLanguageId?: (uri: string) => string | null;
+		onClientIdle?: (info: {
+			server: LspServerDefinition;
+			client: unknown;
+			rootUri: string | null;
+		}) => void;
+		allowNonTerminalWorkspace?: boolean;
+	}
+
+	interface LspClientState {
+		server: LspServerDefinition;
+		client: unknown;
+		transport: LspTransportHandle;
+		rootUri: string | null;
+		attach(uri: string, view: unknown, aliases?: string[]): void;
+		detach(uri: string, view?: unknown): void;
+		dispose(): Promise<void>;
 	}
 
 	type Require = <K extends keyof Modules | (string & {})>(
