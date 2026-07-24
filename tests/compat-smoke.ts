@@ -115,6 +115,16 @@ async function acodeCompatibilitySmoke() {
 		},
 	});
 
+	const workerServer = lsp.defineServer({
+		id: "example-worker-server",
+		label: "Example Worker Server",
+		languages: ["html"],
+		runtimes: ["example-web-worker"],
+		transport: { kind: "external" },
+		startupTimeout: 15_000,
+	});
+	lsp.upsert(workerServer);
+
 	lsp.registerRuntimeProvider({
 		id: "termux",
 		label: "Termux",
@@ -144,6 +154,46 @@ async function acodeCompatibilitySmoke() {
 				kind: "websocket",
 				providerId: "termux",
 				url: "ws://127.0.0.1:45130/",
+			};
+		},
+	});
+
+	lsp.registerRuntimeProvider({
+		id: "example-web-worker",
+		label: "Example Web Worker",
+		canHandle(server) {
+			return server.id === "example-worker-server";
+		},
+		async checkInstallation() {
+			return {
+				status: "present",
+				version: "bundled",
+				canInstall: false,
+				canUpdate: false,
+			};
+		},
+		async start(server, context) {
+			const handle = lsp.workers.createTransport({
+				url: "https://example.invalid/worker.js",
+				name: "example-lsp-worker",
+				serverId: server.id,
+				startupTimeout: server.startupTimeout,
+				configure: {
+					kind: "configure",
+					serverId: server.id,
+					rootUri: context.originalRootUri ?? context.rootUri ?? null,
+					initializationOptions: server.initializationOptions ?? {},
+				},
+				hostHandlers: {
+					readFile: async (params) => String(params.uri ?? ""),
+				},
+			});
+			const transport: Acode.LspMessageTransport = handle.transport;
+			transport.subscribe(() => {});
+			return {
+				kind: "transport",
+				providerId: "example-web-worker",
+				transport: handle,
 			};
 		},
 	});

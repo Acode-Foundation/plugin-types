@@ -134,10 +134,57 @@ declare namespace Acode {
 		maxReconnectAttempts?: number;
 	}
 
+	/**
+	 * CodeMirror-compatible LSP message transport (JSON-RPC strings only).
+	 * Matches `@codemirror/lsp-client` Transport.
+	 */
+	interface LspMessageTransport {
+		send(message: string): void;
+		subscribe(handler: (message: string) => void): void;
+		unsubscribe(handler: (message: string) => void): void;
+	}
+
 	interface LspTransportHandle {
-		transport: unknown;
+		transport: LspMessageTransport;
 		dispose: () => Promise<void> | void;
 		ready: Promise<void>;
+	}
+
+	/**
+	 * Host-side handler for worker `{ kind: "host-request" }` messages.
+	 * Flat fields (e.g. `uri`) and nested `params` are normalized into
+	 * the `params` object passed here.
+	 */
+	type LspWorkerHostHandler = (
+		params: Record<string, unknown>,
+	) => unknown | Promise<unknown>;
+
+	/**
+	 * Options for `acode.require("lsp").workers.createTransport(...)`.
+	 * Covers worker lifecycle, readiness, logging, timeouts, disposal,
+	 * RPC fan-out, and optional host-request dispatch.
+	 */
+	interface LspWorkerTransportOptions {
+		/** Absolute or app-relative URL of the worker script. */
+		url: string;
+		/** Worker name (`WorkerOptions.name`) and default log identity. */
+		name?: string;
+		/** Optional id used for LSP logs and error messages. */
+		serverId?: string;
+		/** Milliseconds to wait for a `{ kind: "ready" }` control message. */
+		startupTimeout?: number;
+		/**
+		 * Optional configure payload posted immediately after the worker is
+		 * created. Typically includes `kind: "configure"` plus server metadata.
+		 */
+		configure?: Record<string, unknown>;
+		/**
+		 * Host-request handlers keyed by method name. Workers send
+		 * `{ kind: "host-request", id, method, params? }` (or flat fields
+		 * such as `uri`). Responses are posted as
+		 * `{ kind: "host-response", id, result?, error? }`.
+		 */
+		hostHandlers?: Record<string, LspWorkerHostHandler>;
 	}
 
 	interface LspTransportContext {
@@ -203,6 +250,12 @@ declare namespace Acode {
 		languages: string[];
 		enabled?: boolean;
 		useWorkspaceFolders?: boolean;
+		/**
+		 * Preferred runtime provider ids for this server (e.g. `"web-worker"`,
+		 * a plugin-registered runtime). Matches `LspServerManifest.runtimes`
+		 * and the runtime selection implementation.
+		 */
+		runtimes?: string[];
 		command?: string;
 		args?: string[];
 		transport?: Partial<LspTransportDescriptor>;
@@ -555,6 +608,14 @@ declare namespace Acode {
 				server: LspServerDefinition,
 				context?: LspRuntimeContext,
 			): Promise<LspRuntimeProvider | null>;
+		};
+		/**
+		 * First-class Web Worker transport helpers for plugin language services.
+		 * Prefer this over reimplementing worker lifecycle, readiness, logging,
+		 * timeouts, disposal, and message fan-out.
+		 */
+		workers: {
+			createTransport(options: LspWorkerTransportOptions): LspTransportHandle;
 		};
 		registerRuntimeProvider: Acode.LspApi["runtimes"]["register"];
 		unregisterRuntimeProvider: Acode.LspApi["runtimes"]["unregister"];
