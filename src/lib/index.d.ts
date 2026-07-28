@@ -5,6 +5,7 @@
 /// <reference path="./editorLanguages.d.ts" />
 /// <reference path="./editorManager.d.ts" />
 /// <reference path="./editorThemes.d.ts" />
+/// <reference path="./fileIndex.d.ts" />
 /// <reference path="./fileList.d.ts" />
 /// <reference path="./fonts.d.ts" />
 /// <reference path="./openFolder.d.ts" />

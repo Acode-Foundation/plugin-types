@@ -689,7 +689,16 @@ declare namespace Acode {
 		codemirror: CodeMirrorNamespace;
 		config: AppConfig;
 		filebrowser: FileBrowser;
+		/**
+		 * @deprecated Prefer {@link FileIndex} (`fileindex`).
+		 * From versionCode 1002, only non-native providers are listed here.
+		 */
 		filelist: FileList;
+		/**
+		 * Asynchronous native workspace index for SAF and `file://` roots.
+		 * Available from versionCode 1002.
+		 */
+		fileindex: FileIndex;
 		fonts: Fonts;
 		fs: FS;
 		fsoperation: FS;

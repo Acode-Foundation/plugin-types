@@ -2,8 +2,22 @@ async function acodeCompatibilitySmoke() {
 	const commands = acode.require("commands");
 	const editorLanguages = acode.require("editorLanguages");
 	const editorThemes = acode.require("editorThemes");
+	const fileIndex = acode.require("fileIndex");
+	const fileList = acode.require("fileList");
 	const lsp = acode.require("lsp");
 	const terminal = acode.require("terminal");
+
+	if (fileIndex.supports("file:///sdcard/project")) {
+		const page = await fileIndex.query({
+			roots: ["file:///sdcard/project"],
+			text: "main",
+			limit: 50,
+		});
+		void page.entries;
+		void page.hasMore;
+	}
+	void fileList.deprecated;
+	void fileList.replacement;
 
 	acode.setPluginInit("com.example.plugin", (_baseUrl, $page, _cache) => {
 		commands.addCommand({

@@ -1,10 +1,24 @@
 declare namespace Acode {
+	/**
+	 * @deprecated Prefer the asynchronous {@link FileIndex} API
+	 * (`acode.require("fileIndex")`) for SAF and `file://` workspaces.
+	 *
+	 * From versionCode 1002, `fileList` only contains files from non-native
+	 * providers (FTP, SFTP, custom storage). Native local workspaces live in
+	 * the native SQLite index and are queried via `fileIndex`.
+	 */
 	interface FileList {
-		(dir: string | (() => object)): Tree[];
+		(dir?: string | ((item: Tree) => unknown)): Tree[] | Tree | null;
 
-		on(event: FileListEvent, callback: (tree: Tree) => void): void;
+		on(event: FileListEvent, callback: (tree: Tree | unknown) => void): void;
 
-		off(event: FileListEvent, callback: (tree: Tree) => void): void;
+		off(event: FileListEvent, callback: (tree: Tree | unknown) => void): void;
+
+		/** Set when accessed via `acode.require("fileList")`. */
+		deprecated?: true;
+
+		/** Set when accessed via `acode.require("fileList")`. */
+		replacement?: "fileIndex";
 	}
 
 	interface Tree {
@@ -14,9 +28,15 @@ declare namespace Acode {
 
 		path: string;
 
-		children: Tree[];
+		children: Tree[] | null;
 
-		parent: Tree;
+		parent: Tree | null;
+
+		mime?: string | null;
+
+		size?: number;
+
+		modifiedDate?: number;
 
 		readonly isConnected: boolean;
 
@@ -31,12 +51,16 @@ declare namespace Acode {
 		name: string;
 		url: string;
 		path: string;
-		parent: string;
+		parent?: string;
+		mime?: string | null;
+		size?: number;
+		modifiedDate?: number;
 		isDirectory: boolean;
 	}
 
 	type FileListEvent =
 		| "add-file"
+		| "push-file"
 		| "remove-file"
 		| "add-folder"
 		| "remove-folder"
