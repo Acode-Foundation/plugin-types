@@ -726,6 +726,11 @@ declare namespace Acode {
 		toast: Toast;
 		tutorial: Tutorial;
 		url: Url;
+		/**
+		 * Native WebView API for fullscreen or headless web content.
+		 * Available from the WebView Plugin API release (v1.12.7+).
+		 */
+		webview: WebViewApi;
 		windowresize: WindowResize;
 	}
 

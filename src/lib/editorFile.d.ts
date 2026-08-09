@@ -35,8 +35,10 @@ declare namespace Acode {
 		onchangemode?: (event: FileEvent) => void;
 		onrun?: (event: FileEvent) => void;
 		oncanrun?: (event: FileEvent) => void;
+		/** Called when the tab pin state changes. */
+		onpinstatechange?: (pinned: boolean) => void;
 
-		constructor(name: string, options: FileOptions);
+		constructor(name: string, options?: FileOptions);
 
 		readonly type: string;
 
@@ -56,6 +58,12 @@ declare namespace Acode {
 
 		editable: boolean;
 
+		/**
+		 * Whether the tab is pinned. Pinned tabs cannot be closed until unpinned
+		 * (unless {@link remove} is called with `ignorePinned: true`).
+		 */
+		pinned: boolean;
+
 		isUnsaved: boolean;
 
 		readonly name: string;
@@ -64,9 +72,18 @@ declare namespace Acode {
 
 		readonly icon: string;
 
-		readonly tab: string;
+		readonly tab: HTMLElement;
 
 		readonly SAFMode: "single" | "tree" | undefined;
+
+		/** Header subtitle used for the editor title bar (path/location). */
+		readonly headerSubtitle: string;
+
+		/** Target pane id when multi-pane layout is active. */
+		paneId?: string | null;
+
+		/** Temporary empty tab created for an empty editor pane. */
+		isPanePlaceholder?: boolean;
 
 		writeToCache(): Promise<void>;
 
@@ -78,13 +95,42 @@ declare namespace Acode {
 
 		writeCanRun(cb: () => boolean | Promise<boolean>): Promise<boolean>;
 
-		remove(force: boolean): Promise<void>;
+		/**
+		 * Removes and closes the file.
+		 * @param force Skip the unsaved confirmation when `true`.
+		 * @param options.ignorePinned Close even if the tab is pinned.
+		 * @param options.silentPinned Suppress the "unpin before closing" toast.
+		 */
+		remove(
+			force?: boolean,
+			options?: {
+				ignorePinned?: boolean;
+				silentPinned?: boolean;
+				suppressPanePlaceholder?: boolean;
+			},
+		): Promise<boolean | undefined>;
 
 		save(): Promise<boolean>;
 
 		saveAs(): Promise<boolean>;
 
+		/** Sets CodeMirror read-only state and updates editability. */
+		setReadOnly(value: boolean): void;
+
 		setMode(mode: string): void;
+
+		/**
+		 * Updates pin state.
+		 * When `reorder` is true, pinned tabs are regrouped in the open file list.
+		 * When `emit` is true, emits `editorManager` update `"pin-tab"`.
+		 */
+		setPinnedState(
+			value: boolean,
+			options?: { reorder?: boolean; emit?: boolean },
+		): boolean;
+
+		/** Toggles pin state. */
+		togglePinned(): boolean;
 
 		makeActive(): void;
 
@@ -126,6 +172,9 @@ declare namespace Acode {
 
 		editable?: boolean;
 
+		/** When true, the file opens as read-only. */
+		readOnly?: boolean;
+
 		deletedFile?: boolean;
 
 		SAFMode?: "single" | "tree";
@@ -140,6 +189,9 @@ declare namespace Acode {
 
 		folds?: Ace.Fold[];
 
+		/** Pin the tab to prevent accidental closing. */
+		pinned?: boolean;
+
 		type?: string;
 
 		tabIcon?: string;
@@ -149,6 +201,15 @@ declare namespace Acode {
 		stylesheets?: string | string[];
 
 		hideQuickTools?: boolean;
+
+		/** Target editor pane id for multi-pane layouts. */
+		paneId?: string;
+
+		/** Target editor pane instance for multi-pane layouts. */
+		pane?: EditorPane;
+
+		/** Temporary empty tab for an empty pane. */
+		isPanePlaceholder?: boolean;
 	}
 
 	interface FileEvent {

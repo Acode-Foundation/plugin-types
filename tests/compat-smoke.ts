@@ -6,6 +6,15 @@ async function acodeCompatibilitySmoke() {
 	const fileList = acode.require("fileList");
 	const lsp = acode.require("lsp");
 	const terminal = acode.require("terminal");
+	const webview = acode.require("webview");
+	const config = acode.require("config");
+	const helpers = acode.require("helpers");
+	const cm = acode.require("codemirror");
+
+	void config.SUPPORTED_EDITOR;
+	void helpers.uuid();
+	void cm.view.EditorView;
+	void webview.create;
 
 	if (fileIndex.supports("file:///sdcard/project")) {
 		const page = await fileIndex.query({
@@ -70,7 +79,20 @@ async function acodeCompatibilitySmoke() {
 	acode.newEditorFile("example.ts", {
 		text,
 		editable: true,
+		pinned: false,
 	});
+
+	const active = editorManager.activeFile;
+	if (active) {
+		active.setPinnedState(true, { reorder: true });
+		active.togglePinned();
+	}
+
+	void editorManager.panes;
+	void editorManager.activePane;
+	void editorManager.splitPaneRight;
+	void editorManager.restartLsp;
+	await editorManager.flushCacheWrites();
 
 	acode.registerFormatter(
 		"com.example.plugin",
