@@ -10,11 +10,23 @@ async function acodeCompatibilitySmoke() {
 	const config = acode.require("config");
 	const helpers = acode.require("helpers");
 	const cm = acode.require("codemirror");
+	const codeHighlight = acode.require("codeHighlight");
 
 	void config.SUPPORTED_EDITOR;
 	void helpers.uuid();
 	void cm.view.EditorView;
+	void cm.highlight.HIGHLIGHT_CLASS;
 	void webview.create;
+	void codeHighlight.HIGHLIGHT_CLASS;
+	void codeHighlight.getStyles();
+	void codeHighlight.getStyleSheet();
+	await codeHighlight.highlightCodeBlock("const ok = true;", "javascript");
+	await codeHighlight.highlight('print("ok")', "python");
+	await codeHighlight.highlightLine(
+		"export function main() {}",
+		"file.ts",
+		"main",
+	);
 
 	if (fileIndex.supports("file:///sdcard/project")) {
 		const page = await fileIndex.query({
@@ -74,6 +86,19 @@ async function acodeCompatibilitySmoke() {
 					},
 				},
 			}),
+	});
+
+	const highlightedHost = document.createElement("div");
+	const highlightedShadow = highlightedHost.attachShadow({ mode: "open" });
+	codeHighlight.applyStyles(highlightedShadow);
+	codeHighlight.applyStyles(highlightedHost);
+	codeHighlight.clearCache();
+
+	acode.newEditorFile("snippet.js", {
+		type: "custom",
+		content: document.createElement("pre"),
+		highlightStyles: true,
+		hideQuickTools: true,
 	});
 
 	acode.newEditorFile("example.ts", {

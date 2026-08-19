@@ -112,6 +112,8 @@ declare namespace Acode {
 		search: typeof import("@codemirror/search");
 		state: typeof import("@codemirror/state");
 		view: typeof import("@codemirror/view");
+		/** Same instance as `acode.require("codeHighlight")`. */
+		highlight: CodeHighlight;
 	}
 
 	interface LspTransportDescriptor {
@@ -687,6 +689,11 @@ declare namespace Acode {
 		editorthemes: EditorThemes;
 		encodings: Encodings;
 		codemirror: CodeMirrorNamespace;
+		/**
+		 * Static CodeMirror highlighter for plugin UIs and custom editor
+		 * tabs. Available from versionCode 1008.
+		 */
+		codehighlight: CodeHighlight;
 		config: AppConfig;
 		filebrowser: FileBrowser;
 		/**

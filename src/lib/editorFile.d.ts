@@ -200,6 +200,14 @@ declare namespace Acode {
 
 		stylesheets?: string | string[];
 
+		/**
+		 * Adopt Acode's static CodeMirror highlight stylesheet into this
+		 * custom tab's shadow root. Off by default — set this only when
+		 * the tab will render `acode.require("codeHighlight")` HTML.
+		 * Available from versionCode 1008.
+		 */
+		highlightStyles?: boolean;
+
 		hideQuickTools?: boolean;
 
 		/** Target editor pane id for multi-pane layouts. */
