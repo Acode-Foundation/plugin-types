@@ -23,6 +23,12 @@ declare namespace Acode {
 		cacheFile: FileSystem;
 		firstInit: boolean;
 		ctx: PluginContext | null;
+		/**
+		 * Plugin-bound File Icons API. Same instance as
+		 * `acode.require("fileIcons")` captured in the main script.
+		 * Available from versionCode 1012.
+		 */
+		fileIcons: FileIcons;
 	}
 
 	type PluginSettingSelectOption =
@@ -706,6 +712,11 @@ declare namespace Acode {
 		 * Available from versionCode 1002.
 		 */
 		fileindex: FileIndex;
+		/**
+		 * Plugin-bound file and folder icon pack API.
+		 * Available from versionCode 1012.
+		 */
+		fileicons: FileIcons;
 		fonts: Fonts;
 		fs: FS;
 		fsoperation: FS;

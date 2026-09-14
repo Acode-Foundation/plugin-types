@@ -124,5 +124,7 @@ declare namespace Acode {
 		showSideButtons: boolean;
 		showAnnotations: boolean;
 		pluginsDisabled: Record<string, boolean>;
+		/** Active file/folder icon pack ID. Defaults to `"builtin"`. */
+		iconTheme: string;
 	}
 }

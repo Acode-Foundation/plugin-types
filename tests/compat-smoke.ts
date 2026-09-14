@@ -3,12 +3,13 @@ async function acodeCompatibilitySmoke() {
 	const editorLanguages = acode.require("editorLanguages");
 	const editorThemes = acode.require("editorThemes");
 	const fileIndex = acode.require("fileIndex");
+	const fileIcons = acode.require("fileIcons");
 	const fileList = acode.require("fileList");
+	const helpers = acode.require("helpers");
 	const lsp = acode.require("lsp");
 	const terminal = acode.require("terminal");
 	const webview = acode.require("webview");
 	const config = acode.require("config");
-	const helpers = acode.require("helpers");
 	const cm = acode.require("codemirror");
 	const codeHighlight = acode.require("codeHighlight");
 
@@ -40,7 +41,50 @@ async function acodeCompatibilitySmoke() {
 	void fileList.deprecated;
 	void fileList.replacement;
 
-	acode.setPluginInit("com.example.plugin", (_baseUrl, $page, _cache) => {
+	void helpers.getIconForFile("package.json");
+	void helpers.getIconForFolder("src", { expanded: true, isRoot: false });
+
+	const iconRegistration = fileIcons.register({
+		id: "com.example.plugin",
+		name: "Example Icons",
+		icons: "https://example.invalid/icons/",
+		fileNames: { "package.json": "nodejs" },
+		fileExtensions: { js: "javascript", "d.ts": "typescript-def" },
+		folderNames: { src: "folder-src" },
+		folderNamesExpanded: { src: "folder-src-open" },
+		folder: "folder",
+		folderExpanded: "folder-open",
+	});
+	void fileIcons.icon("app.ts");
+	void fileIcons.icon({
+		kind: "folder",
+		name: "src",
+		expanded: true,
+		isRoot: false,
+	});
+	const stopIcons = fileIcons.onChange(({ activeId, preferredId }) => {
+		void activeId;
+		void preferredId;
+	});
+	stopIcons();
+	iconRegistration.dispose();
+
+	acode.setPluginInit("com.example.plugin", (_baseUrl, $page, options) => {
+		const boundIcons = options.fileIcons;
+		boundIcons.register({
+			id: "com.example.plugin",
+			name: "Example Icons",
+			icons: {
+				javascript: { src: "https://example.invalid/javascript.svg" },
+				folder: {
+					src: "https://example.invalid/folder.svg",
+					monochrome: true,
+				},
+				text: { className: "file file_type_default" },
+			},
+			fileExtensions: { js: "javascript" },
+		});
+
 		commands.addCommand({
 			name: "example-plugin",
 			description: "Open the example page",

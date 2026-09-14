@@ -1,6 +1,16 @@
 declare namespace Acode {
 	interface Helpers {
+		/** CSS class string for a file icon from the active icon pack. */
 		getIconForFile(filename: string): string;
+
+		/**
+		 * CSS class string for a folder icon from the active icon pack.
+		 * Available from versionCode 1012.
+		 */
+		getIconForFolder(
+			name: string,
+			options?: { expanded?: boolean; isRoot?: boolean },
+		): string;
 
 		sortDir(
 			list: any[],
